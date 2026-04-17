@@ -4,10 +4,17 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta http-equiv="refresh" content="0; url=rain-for-vova.html">
-<link rel="canonical" href="rain-for-vova.html">
 <title>Rain for Vova</title>
+<script>
+  // Кэш-бастер — каждая загрузка index.html ведёт на свежий rain-for-vova.html
+  var v = Date.now();
+  window.location.replace("rain-for-vova.html?v=" + v);
+</script>
 </head><body>
-<p>Redirecting to <a href="rain-for-vova.html">rain-for-vova.html</a>…</p>
-<script>window.location.replace("rain-for-vova.html");</script>
+<p style="font-family: sans-serif; text-align: center; margin-top: 40vh;">
+  Redirecting… <a id="lnk" href="rain-for-vova.html">tap here if not redirected</a>
+</p>
+<script>
+  document.getElementById("lnk").href = "rain-for-vova.html?v=" + Date.now();
+</script>
 </body></html>
