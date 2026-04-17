@@ -2,105 +2,361 @@
 <html lang="ru">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
-<title>Rain for Vova</title>
+<title>Вова, приветик!</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html, body {
     height: 100%;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
-    color: #111;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    font-family: "Georgia", "Times New Roman", serif;
+    background: linear-gradient(180deg, #242f42 0%, #334159 55%, #425070 100%);
     overflow: hidden;
+    color: #e6e8ef;
   }
-  body {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 24px;
-    text-align: center;
-  }
-  canvas.rain {
+  body { position: relative; min-height: 100vh; }
+
+  /* Storm clouds at top */
+  .clouds {
     position: fixed;
-    inset: 0;
-    width: 100%;
-    height: 100%;
+    top: 0; left: 0; right: 0;
+    height: 28vh;
+    z-index: 2;
+    background:
+      radial-gradient(ellipse 360px 120px at 10% 30%, rgba(18,22,34,0.7) 0%, rgba(18,22,34,0) 60%),
+      radial-gradient(ellipse 520px 180px at 45% 10%, rgba(14,18,28,0.85) 0%, rgba(14,18,28,0) 65%),
+      radial-gradient(ellipse 420px 140px at 78% 25%, rgba(22,28,42,0.75) 0%, rgba(22,28,42,0) 60%),
+      linear-gradient(180deg, rgba(20,26,40,0.6) 0%, rgba(20,26,40,0) 100%);
     pointer-events: none;
-    z-index: 0;
   }
+
+  /* Rain canvas */
+  canvas.rain {
+    position: fixed; inset: 0;
+    width: 100%; height: 100%;
+    pointer-events: none; z-index: 3;
+  }
+
+  /* Flying props (umbrellas and laptops) */
+  .flyer {
+    position: fixed;
+    z-index: 4;
+    user-select: none;
+    pointer-events: none;
+    filter: drop-shadow(0 8px 14px rgba(0,0,0,0.4));
+    will-change: transform;
+  }
+  @keyframes fly-right {
+    from { transform: translate3d(calc(-20vw - 120px), 0, 0); }
+    to   { transform: translate3d(calc(100vw + 120px), 0, 0); }
+  }
+  @keyframes fly-left {
+    from { transform: translate3d(calc(100vw + 120px), 0, 0); }
+    to   { transform: translate3d(calc(-20vw - 120px), 0, 0); }
+  }
+  @keyframes bob {
+    0%, 100% { transform: translateY(0) rotate(var(--rot, 0deg)); }
+    50%      { transform: translateY(-18px) rotate(calc(var(--rot, 0deg) + 6deg)); }
+  }
+  .flyer .inner {
+    display: inline-block;
+    animation: bob 2.6s ease-in-out infinite;
+  }
+
+  /* Headline */
   main {
     position: relative;
-    z-index: 1;
-    max-width: 720px;
-    background: rgba(255, 255, 255, 0.96);
-    padding: 48px 40px;
-    border-radius: 24px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    z-index: 5;
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 16vh 28px 0;
+    text-align: center;
+    animation: float-text 4.5s ease-in-out infinite;
+  }
+  @keyframes float-text {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(-8px); }
   }
   h1 {
-    font-size: 42px;
+    font-size: clamp(58px, 9.5vw, 116px);
     font-weight: 700;
-    margin-bottom: 12px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    line-height: 0.95;
+    color: #dadce3;
+    letter-spacing: 0.5px;
+    text-shadow: 0 3px 0 rgba(0,0,0,0.2), 0 12px 28px rgba(0,0,0,0.3);
   }
-  .subtitle {
-    font-size: 17px;
-    color: #5a5c7c;
-    margin-bottom: 36px;
-    line-height: 1.55;
+  .tag {
+    margin-top: 26px;
+    font-size: clamp(22px, 3vw, 36px);
+    font-style: italic;
+    color: #d8dae2;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.3);
   }
+  .pulse {
+    display: inline-block;
+    animation: pulse 1.3s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50%      { transform: scale(1.22); }
+  }
+
+  /* Button */
+  .btn-wrap { margin-top: 42px; display: flex; justify-content: center; }
   .btn {
     display: inline-block;
     padding: 20px 48px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
     font-size: 19px;
     font-weight: 700;
     color: #fff;
-    background: linear-gradient(135deg, #ff6b6b 0%, #ffa94d 50%, #ffd93d 100%);
+    text-decoration: none;
     border: none;
     border-radius: 14px;
-    text-decoration: none;
     cursor: pointer;
-    box-shadow: 0 10px 30px rgba(255, 107, 107, 0.5), 0 4px 12px rgba(255, 217, 61, 0.3);
+    background: linear-gradient(135deg, #ff6b6b 0%, #ffa94d 50%, #ffd93d 100%);
+    background-size: 200% 100%;
+    box-shadow:
+      0 14px 34px rgba(255, 107, 107, 0.45),
+      0 4px 12px rgba(255, 217, 61, 0.3),
+      inset 0 1px 0 rgba(255,255,255,0.35);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
     letter-spacing: 0.2px;
-    background-size: 200% 100%;
     animation: shimmer 4s ease-in-out infinite;
   }
   .btn:hover {
     transform: translateY(-3px) scale(1.03);
-    box-shadow: 0 18px 40px rgba(255, 107, 107, 0.6), 0 6px 16px rgba(255, 217, 61, 0.4);
+    box-shadow: 0 20px 46px rgba(255,107,107,0.55), 0 6px 18px rgba(255,217,61,0.4), inset 0 1px 0 rgba(255,255,255,0.4);
   }
-  .btn:active {
-    transform: translateY(0) scale(1);
-  }
+  .btn:active { transform: translateY(0) scale(1); }
   @keyframes shimmer {
     0%, 100% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
+    50%      { background-position: 100% 50%; }
   }
-  .meta {
-    margin-top: 28px;
-    font-size: 13px;
-    color: #8a8ca5;
+
+  /* Puddles at the bottom */
+  .puddles-bg {
+    position: fixed;
+    left: 0; right: 0; bottom: 0;
+    height: 26vh;
+    z-index: 2;
+    background: linear-gradient(180deg, rgba(20,26,40,0) 0%, rgba(15,20,32,0.85) 55%, rgba(8,12,20,0.96) 100%);
+    pointer-events: none;
+  }
+  .puddle {
+    position: fixed;
+    z-index: 3;
+    border-radius: 50%;
+    background: radial-gradient(ellipse at 35% 40%,
+      rgba(220,230,245,0.5) 0%,
+      rgba(180,200,225,0.28) 30%,
+      rgba(100,120,150,0.15) 70%,
+      rgba(50,65,90,0.06) 100%);
+    box-shadow: inset 0 2px 6px rgba(255,255,255,0.08);
+    pointer-events: none;
+  }
+  .p1 { width: 260px; height: 70px; left: 4%;  bottom: 5vh; }
+  .p2 { width: 360px; height: 94px; left: 26%; bottom: 2vh; }
+  .p3 { width: 220px; height: 60px; left: 60%; bottom: 10vh; }
+  .p4 { width: 400px; height: 98px; left: 48%; bottom: 0; }
+  .p5 { width: 180px; height: 48px; left: 82%; bottom: 8vh; }
+
+  /* Ripples on puddles */
+  .ripple {
+    position: fixed;
+    z-index: 4;
+    border: 1.5px solid rgba(230,238,255,0.55);
+    border-radius: 50%;
+    opacity: 0;
+    pointer-events: none;
+    animation: ripple 3s ease-out infinite;
+  }
+  @keyframes ripple {
+    0%   { width: 0;    height: 0;   opacity: 0.9; }
+    80%  { opacity: 0.08; }
+    100% { width: 54px; height: 16px; opacity: 0; }
+  }
+  .r1 { left: 12%; bottom: 8vh;  animation-delay: 0s;   }
+  .r2 { left: 34%; bottom: 4vh;  animation-delay: 0.5s; }
+  .r3 { left: 58%; bottom: 11vh; animation-delay: 1.1s; }
+  .r4 { left: 72%; bottom: 6vh;  animation-delay: 1.8s; }
+  .r5 { left: 48%; bottom: 2vh;  animation-delay: 2.3s; }
+
+  /* Motorcycle drowning in a puddle */
+  .moto {
+    position: fixed;
+    left: 42%;
+    bottom: 4vh;
+    z-index: 5;
+    font-size: 108px;
+    user-select: none;
+    pointer-events: none;
+    filter: drop-shadow(0 8px 14px rgba(0,0,0,0.55)) saturate(0.85) brightness(0.9);
+    animation: moto-bob 3.2s ease-in-out infinite;
+    transform-origin: 50% 80%;
+  }
+  @keyframes moto-bob {
+    0%, 100% { transform: translateY(0) rotate(-6deg); }
+    50%      { transform: translateY(-6px) rotate(-3deg); }
+  }
+  /* Water surface line cutting through the motorcycle */
+  .moto-water {
+    position: fixed;
+    left: calc(42% - 10px);
+    bottom: calc(4vh + 18px);
+    width: 140px;
+    height: 8px;
+    z-index: 6;
+    border-radius: 50%;
+    background: radial-gradient(ellipse at center, rgba(220,230,245,0.7) 0%, rgba(220,230,245,0) 70%);
+    pointer-events: none;
+    animation: moto-surface 3.2s ease-in-out infinite;
+  }
+  @keyframes moto-surface {
+    0%, 100% { transform: scaleX(1); opacity: 0.8; }
+    50%      { transform: scaleX(1.08); opacity: 1; }
+  }
+  /* Ripples around the motorcycle */
+  .moto-ripple {
+    position: fixed;
+    left: calc(42% + 50px);
+    bottom: calc(4vh + 14px);
+    z-index: 5;
+    border: 1.5px solid rgba(230,238,255,0.6);
+    border-radius: 50%;
+    opacity: 0;
+    pointer-events: none;
+    animation: ripple 2.6s ease-out infinite;
+  }
+  .moto-ripple.d2 { left: calc(42% + 10px); bottom: calc(4vh + 10px); animation-delay: 0.9s; }
+  .moto-ripple.d3 { left: calc(42% + 90px); bottom: calc(4vh + 18px); animation-delay: 1.7s; }
+
+  .credit {
+    position: fixed;
+    bottom: calc(env(safe-area-inset-bottom, 0) + 8px);
+    left: 0; right: 0;
+    text-align: center;
+    font-size: 11px;
+    color: rgba(255,255,255,0.45);
+    font-family: -apple-system, system-ui, sans-serif;
+    z-index: 6;
+  }
+
+  /* ===== Mobile (portrait phones) ===== */
+  @media (max-width: 640px) {
+    html, body { overflow-x: hidden; overflow-y: auto; }
+
+    main {
+      padding: 10vh 20px 30vh;    /* нижний отступ, чтобы кнопка не упёрлась в лужи */
+    }
+    h1 {
+      font-size: clamp(42px, 11vw, 64px);
+      line-height: 1;
+    }
+    .tag {
+      margin-top: 16px;
+      font-size: clamp(17px, 4.8vw, 22px);
+    }
+    .btn-wrap { margin-top: 28px; }
+    .btn {
+      padding: 16px 28px;
+      font-size: 16px;
+      max-width: 92vw;
+      white-space: normal;
+      line-height: 1.25;
+    }
+
+    /* Уменьшаем лужи — на узком экране 400px не помещаются */
+    .p1 { width: 160px; height: 44px; left: 2%;  bottom: 6vh; }
+    .p2 { width: 210px; height: 56px; left: 22%; bottom: 3vh; }
+    .p3 { width: 150px; height: 40px; left: 58%; bottom: 10vh; }
+    .p4 { width: 240px; height: 62px; left: 20%; bottom: 0; }
+    .p5 { width: 130px; height: 36px; left: 72%; bottom: 7vh; }
+
+    /* Мотоцикл меньше и ближе к центру */
+    .moto {
+      left: 32%;
+      bottom: 4vh;
+      font-size: 72px;
+    }
+    .moto-water {
+      left: calc(32% - 4px);
+      bottom: calc(4vh + 12px);
+      width: 92px;
+    }
+    .moto-ripple      { left: calc(32% + 34px); bottom: calc(4vh + 10px); }
+    .moto-ripple.d2   { left: calc(32% + 6px);  bottom: calc(4vh + 6px); }
+    .moto-ripple.d3   { left: calc(32% + 60px); bottom: calc(4vh + 12px); }
+
+    /* Текст на мобилке перестаём плавать — трясёт весь layout, неудобно */
+    main { animation: none; }
+
+    /* Облака тоньше */
+    .clouds { height: 22vh; }
+
+    /* Зона луж компактнее */
+    .puddles-bg { height: 22vh; }
+
+    .credit { font-size: 10px; }
+  }
+
+  /* ===== Safe-area (iPhone с челкой) ===== */
+  @supports(padding: max(0px)) {
+    main {
+      padding-left: max(20px, env(safe-area-inset-left));
+      padding-right: max(20px, env(safe-area-inset-right));
+    }
+  }
+
+  /* ===== Меньше нагрузка на слабых телефонах ===== */
+  @media (max-width: 480px), (prefers-reduced-motion: reduce) {
+    .flyer .inner { animation: none; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
   }
 </style>
 </head>
 <body>
+
+<div class="clouds"></div>
 <canvas class="rain" id="rain"></canvas>
+
 <main>
-  <h1>Rain for Vova ☔</h1>
-  <p class="subtitle">
-    Результаты тестирования копилота на 173 вопросах<br>
-    по корпоративной базе знаний MWS и HR-документам.
-  </p>
-  <a class="btn" href="report.html">Посмотреть результаты теста Confluence →</a>
-  <p class="meta">Отчёт автогенерирован LLM-as-a-Judge · 2026-04-17</p>
+  <h1>Вова, приветик!</h1>
+  <p class="tag">Это тебе на случай дождя <span class="pulse">💻</span></p>
+  <div class="btn-wrap">
+    <a class="btn" href="report.html">Посмотреть результаты теста Confluence →</a>
+  </div>
 </main>
+
+<div class="puddles-bg"></div>
+<div class="puddle p1"></div>
+<div class="puddle p2"></div>
+<div class="puddle p3"></div>
+<div class="puddle p4"></div>
+<div class="puddle p5"></div>
+<div class="ripple r1"></div>
+<div class="ripple r2"></div>
+<div class="ripple r3"></div>
+<div class="ripple r4"></div>
+<div class="ripple r5"></div>
+
+<!-- Motorcycle drowning in a puddle -->
+<div class="moto">🏍️</div>
+<div class="moto-water"></div>
+<div class="moto-ripple"></div>
+<div class="moto-ripple d2"></div>
+<div class="moto-ripple d3"></div>
+
+<div class="credit">Copilot Judge · 2026-04-17</div>
+
 <script>
+// ===== RAIN (180+ drops) =====
 (() => {
   const canvas = document.getElementById('rain');
   const ctx = canvas.getContext('2d');
@@ -108,12 +364,13 @@
   const resize = () => {
     W = canvas.width = window.innerWidth;
     H = canvas.height = window.innerHeight;
-    drops = Array.from({length: 180}, () => ({
+    const isMobile = window.matchMedia('(max-width: 640px)').matches;
+    drops = Array.from({length: isMobile ? 120 : 220}, () => ({
       x: Math.random() * W,
       y: Math.random() * H,
-      l: 12 + Math.random() * 18,
-      s: 8 + Math.random() * 10,
-      o: 0.2 + Math.random() * 0.4,
+      l: 10 + Math.random() * 22,
+      s: 7 + Math.random() * 11,
+      o: 0.15 + Math.random() * 0.45,
     }));
   };
   resize();
@@ -122,8 +379,8 @@
     ctx.clearRect(0, 0, W, H);
     ctx.lineCap = 'round';
     for (const d of drops) {
-      ctx.strokeStyle = `rgba(200, 220, 255, ${d.o})`;
-      ctx.lineWidth = 1.4;
+      ctx.strokeStyle = `rgba(210,225,245,${d.o})`;
+      ctx.lineWidth = 1.3;
       ctx.beginPath();
       ctx.moveTo(d.x, d.y);
       ctx.lineTo(d.x, d.y + d.l);
@@ -134,6 +391,43 @@
     requestAnimationFrame(tick);
   };
   tick();
+})();
+
+// ===== FLYING UMBRELLAS & LAPTOPS =====
+(() => {
+  const icons = ['☂️', '☔', '💻', '☂️', '💻'];
+  const spawn = () => {
+    const el = document.createElement('div');
+    el.className = 'flyer';
+    const inner = document.createElement('span');
+    inner.className = 'inner';
+    inner.textContent = icons[Math.floor(Math.random() * icons.length)];
+    el.appendChild(inner);
+
+    // random top position
+    const top = 3 + Math.random() * 75;      // %
+    // random size
+    const size = 34 + Math.random() * 72;    // px
+    // random direction
+    const goingRight = Math.random() < 0.5;
+    // random speed (seconds)
+    const duration = 9 + Math.random() * 9;
+    // random rotation
+    const rot = (Math.random() * 60 - 30);   // -30..30 deg
+
+    el.style.top = top + 'vh';
+    inner.style.fontSize = size + 'px';
+    inner.style.setProperty('--rot', rot + 'deg');
+    el.style.animation = `${goingRight ? 'fly-right' : 'fly-left'} ${duration}s linear forwards`;
+
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), duration * 1000 + 200);
+  };
+  const isMobile = window.matchMedia('(max-width: 640px)').matches;
+  // initial burst so scene isn't empty
+  for (let i = 0; i < (isMobile ? 3 : 6); i++) setTimeout(spawn, i * 250);
+  // continuous spawn: phone every 2s, desktop every 1.2s
+  setInterval(spawn, isMobile ? 2000 : 1200);
 })();
 </script>
 </body>
